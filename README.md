@@ -4,7 +4,7 @@ A simple retry library for python
 Example:
 ```python
 import requests
-from reattempt import ReAttempt
+from reattempt import StandardReAttempt
 
 def get_response_from_github(**kwargs):
   response = requests.get(**kwargs)
