@@ -1,5 +1,5 @@
 # reattempt.py
-from typing import Callable, Type, Tuple, TypeVar, Optional
+from typing import Callable, Type, Tuple, TypeVar, Optional, Union
 from abc import ABC, abstractmethod
 
 T = TypeVar('T')
@@ -9,7 +9,7 @@ class ReAttempt(ABC):
 	def __init__(
 		self,
 		max_retries: int = 3,  # positive integer
-		acceptable_exception: Tuple[Type[Exception], ...] = Exception,
+		acceptable_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
 		on_success: Optional[Callable[[int, int, T], None]] = None,
 		on_exception: Optional[Callable[[int, int, Exception], None]] = None
 	):
@@ -29,20 +29,20 @@ class ReAttempt(ABC):
 		pass
 	
 	@abstractmethod
-	def run(self, func: Callable[..., T], *args, **kwargs) -> tuple[bool, Optional[T]]:
+	def run(self, func: Callable[..., T], *args, **kwargs) -> Tuple[bool, Optional[T]]:
 		pass
 
 
 class StandardReAttempt(ReAttempt):
 	@staticmethod
 	def default_on_success(retry_index: int, max_retries: int, result: T) -> None:
-		print(f'\tAttempt {retry_index + 1}/{max_retries}: Success.')
+		print('\tAttempt {}/{}: Success.'.format(retry_index + 1, max_retries))
 	
 	@staticmethod
 	def default_on_exception(retry_index: int, max_retries: int, exception: Exception) -> None:
-		print(f'\tAttempt {retry_index + 1}/{max_retries}: {exception}')
+		print('\tAttempt {}/{}: {}'.format(retry_index + 1, max_retries, exception))
 	
-	def run(self, func: Callable[..., T], *args, **kwargs) -> tuple[bool, Optional[T]]:
+	def run(self, func: Callable[..., T], *args, **kwargs) -> Tuple[bool, Optional[T]]:
 		for retry_index in range(self._max_retries):
 			try:
 				result = func(*args, **kwargs)
