@@ -9,8 +9,8 @@ class ReAttempt:
 		self,
 		max_retries: int = 3,  # positive integer
 		acceptable_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
-		on_success: Optional[Callable[[int, int, T], None]] = None,
-		on_exception: Optional[Callable[[int, int, Exception], None]] = None,
+		on_success: Optional[Callable[[int, T], None]] = None,
+		on_exception: Optional[Callable[[int, Exception], None]] = None,
 		pass_retry_info: bool = False
 	):
 		self._max_retries = max_retries
@@ -47,3 +47,20 @@ class ReAttempt:
 				else:
 					raise
 		return False, None
+
+
+class QuietReAttempt(ReAttempt):
+	def __init__(
+		self,
+		max_retries: int = 3,
+		acceptable_exception: Union[Type[Exception], Tuple[Type[Exception], ...]] = Exception,
+		on_success: Optional[Callable[[int, T], None]] = None,
+		on_exception: Optional[Callable[[int, Exception], None]] = None, pass_retry_info: bool = False
+	):
+		super().__init__(max_retries, acceptable_exception, on_success, on_exception, pass_retry_info)
+		
+	def default_on_success(self, retry_index: int, result: T) -> None:
+		pass
+	
+	def default_on_exception(self, retry_index: int, exception: Exception) -> None:
+		pass
