@@ -1,2 +1,2 @@
 # __init__.py
-from .reattempt import ReAttempt, StandardReAttempt
+from .reattempt import ReAttempt
