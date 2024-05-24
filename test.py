@@ -23,4 +23,3 @@ if __name__ == '__main__':
         print('Raise List: {}'.format(raise_list))
         result = re_attempt.run(partial(function, raise_list = raise_list))
         print('Return: {}'.format(result))
-        print('!')
