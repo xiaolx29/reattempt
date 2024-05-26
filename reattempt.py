@@ -19,11 +19,11 @@ class ReAttempt:
 		self._on_exception = self.default_on_exception if on_exception is None else on_exception
 		self._pass_retry_info = pass_retry_info
 	
-	def default_on_success(self, retry_index: int, result: T) -> None:
-		print('\tAttempt {}/{}: Result: {}.'.format(retry_index + 1, self._max_retries, result))
+	def default_on_success(self, retry_index: int, max_retries: int, result: T) -> None:
+		print('\tAttempt {}/{}: Result: {}.'.format(retry_index + 1, max_retries, result))
 
-	def default_on_exception(self, retry_index: int, exception: Exception) -> None:
-		print('\tAttempt {}/{}: Exception: {}{}.'.format(retry_index + 1, self._max_retries, type(exception), exception))
+	def default_on_exception(self, retry_index: int, max_retries: int, exception: Exception) -> None:
+		print('\tAttempt {}/{}: Exception: {}{}.'.format(retry_index + 1, max_retries, type(exception), exception))
 	
 	def attempt(self, func: Callable[..., T], retry_index: int, *args, **kwargs) -> T:
 		if self._pass_retry_info:
@@ -38,10 +38,10 @@ class ReAttempt:
 		for retry_index in range(self._max_retries):
 			try:
 				result = self.attempt(func, retry_index, *args, **kwargs)
-				self._on_success(retry_index, result)
+				self._on_success(retry_index, self.max_retries, result)
 				return True, result
 			except Exception as exception:
-				self._on_exception(retry_index, exception)
+				self._on_exception(retry_index, self._max_retries, exception)
 				if self.raise_or_continue(exception):
 					continue
 				else:
@@ -59,8 +59,8 @@ class QuietReAttempt(ReAttempt):
 	):
 		super().__init__(max_retries, acceptable_exception, on_success, on_exception, pass_retry_info)
 		
-	def default_on_success(self, retry_index: int, result: T) -> None:
+	def default_on_success(self, retry_index: int, max_retries: int, result: T) -> None:
 		pass
 	
-	def default_on_exception(self, retry_index: int, exception: Exception) -> None:
+	def default_on_exception(self, retry_index: int, max_retries: int, exception: Exception) -> None:
 		pass
