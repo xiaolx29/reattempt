@@ -38,7 +38,7 @@ class ReAttempt:
 		for retry_index in range(self._max_retries):
 			try:
 				result = self.attempt(func, retry_index, *args, **kwargs)
-				self._on_success(retry_index, self.max_retries, result)
+				self._on_success(retry_index, self._max_retries, result)
 				return True, result
 			except Exception as exception:
 				self._on_exception(retry_index, self._max_retries, exception)
